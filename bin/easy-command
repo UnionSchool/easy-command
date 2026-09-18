@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+source_path="${BASH_SOURCE[0]}"
+while [[ -h "$source_path" ]]; do
+    source_directory="$(cd -P "$(dirname "$source_path")" && pwd)"
+    source_path="$(readlink "$source_path")"
+    [[ "$source_path" == /* ]] || source_path="$source_directory/$source_path"
+done
+
+package_directory="$(cd -P "$(dirname "$source_path")/.." && pwd)"
+exec "$package_directory/install.sh" "$@"

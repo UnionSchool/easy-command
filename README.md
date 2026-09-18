@@ -35,6 +35,14 @@ Install the latest version:
 > 安装最新版本：
 
 ```bash
+npx easy-command --yes
+```
+
+Or install directly from GitHub without Node.js/npm:
+
+> 或者无需 Node.js/npm，直接从 GitHub 安装：
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/main/install.sh | bash -s -- --yes
 ```
 
@@ -126,7 +134,15 @@ For production, pin a release tag instead of running `main` directly:
 > 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v1.0.3/install.sh | bash -s -- --yes
+npx easy-command@1.0.4 --yes
+```
+
+Or, without npm:
+
+> 或者不使用 npm：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v1.0.4/install.sh | bash -s -- --yes
 ```
 
 ## License

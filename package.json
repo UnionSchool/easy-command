@@ -1,0 +1,33 @@
+{
+  "name": "easy-command",
+  "version": "1.0.4",
+  "description": "Configure a polished Zsh terminal with one command.",
+  "license": "MIT",
+  "bin": {
+    "easy-command": "bin/easy-command"
+  },
+  "files": [
+    "bin",
+    "install.sh",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UnionSchool/easy-command.git"
+  },
+  "bugs": {
+    "url": "https://github.com/UnionSchool/easy-command/issues"
+  },
+  "homepage": "https://github.com/UnionSchool/easy-command#readme",
+  "keywords": [
+    "zsh",
+    "oh-my-zsh",
+    "terminal",
+    "cli",
+    "installer"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
