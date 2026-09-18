@@ -31,6 +31,7 @@ create_fake brew '
 if [[ "$1" == "--prefix" ]]; then
     printf "%s\\n" "$EASY_COMMAND_TEST_HOME/homebrew"
 fi'
+create_fake npm 'exit 0'
 create_fake zsh 'exit 0'
 create_fake git '
 if [[ "$1" == "clone" ]]; then
@@ -51,13 +52,19 @@ bash "$ROOT_DIR/install.sh" --help >/dev/null
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
+bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.4"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
-bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-zoxide --with-fzf --with-git-aliases
+bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
 
 grep -Fqx '# personal setting' "$TEST_HOME/.zshrc"
 grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"
 grep -Fqx '    function z() {' "$TEST_HOME/.zshrc"
+grep -Fqx '        if [[ "$1" == '\''add'\'' || "$1" == '\''a'\'' ]]; then' "$TEST_HOME/.zshrc"
+grep -Fqx '    function ec() {' "$TEST_HOME/.zshrc"
+grep -Fqx '            doctor|repair|update|install|uninstall)' "$TEST_HOME/.zshrc"
+grep -Fqx '            list|ls|l)' "$TEST_HOME/.zshrc"
+grep -Fqx '            del|remove)' "$TEST_HOME/.zshrc"
 grep -Fqx '# easy-command: fzf' "$TEST_HOME/.zshrc"
 [[ -d "$TEST_HOME/.easy-command/oh-my-zsh/.git" ]]
 

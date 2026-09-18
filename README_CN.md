@@ -10,10 +10,17 @@
 
 ## 安装
 
-### npm 安装
+### npm 安装（推荐）
 
 ```bash
-npx easy-command -y
+npm i -g easy-command
+easy-command -y
+```
+
+也可以一条命令完成全局安装和终端配置：
+
+```bash
+npx easy-command -y --global
 ```
 
 ### GitHub 安装
@@ -34,19 +41,19 @@ exec zsh -l
 
 ```bash
 # 预览安装过程，不修改本机环境
-npx easy-command --dry-run
+easy-command --dry-run
 
 # 检查 Shell、依赖、托管仓库和 .zshrc 配置
-npx easy-command doctor
+easy-command doctor
 
 # 恢复缺失的托管文件和配置
-npx easy-command repair -y
+easy-command repair -y
 
 # 安全更新 Oh My Zsh 和托管插件
-npx easy-command update -y
+easy-command update -y
 ```
 
-`npx` 无需全局安装即可运行命令。若希望直接使用更短的 `easy-command` 命令，可执行 `npm install -g easy-command`。
+如不希望全局安装 npm 包，将示例中的 `easy-command` 替换为 `npx easy-command` 即可。
 
 ## 安装后即可使用
 
@@ -83,11 +90,13 @@ bash install.sh -y --no-chsh
 # 仅删除 easy-command 管理的 .zshrc 配置区块
 bash install.sh --uninstall
 
-# 启用可选的目录跳转、模糊搜索和 Git 快捷操作
-bash install.sh -y --with-zoxide --with-fzf --with-git-aliases
+# 启用可选的模糊搜索和 Git 快捷操作
+bash install.sh -y --with-fzf --with-git-aliases
 ```
 
-`zoxide` 提供 `z <关键词>` 目录跳转，也支持 `z add <目录>` 手动记录目录；`fzf` 提供历史命令和文件的模糊搜索；Git 快捷操作使用 `ec-` 前缀，例如 `git ec-status`，不会覆盖已有别名。
+默认安装 `zoxide`，可使用 `z <关键词>` 跳转目录，也支持 `z add <目录>` 或 `z a <目录>` 手动记录目录；使用 `--without-zoxide` 可关闭。`fzf` 提供历史命令和文件的模糊搜索；Git 快捷操作使用 `ec-` 前缀，例如 `git ec-status`，不会覆盖已有别名。
+
+统一入口使用 `ec`：`ec <关键词>` 跳转目录，`ec add <目录>` 或 `ec a <目录>` 记录目录，`ec list` 或 `ec l` 查看记录，`ec del <目录>` 或 `ec remove <目录>` 删除记录；`ec doctor`、`ec repair`、`ec update`、`ec install`、`ec uninstall` 和 `ec --dry-run` 执行对应的 easy-command 维护操作。为兼容 zoxide，原有 `z` 命令仍可使用。
 
 ## 系统要求
 
@@ -121,13 +130,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.3 -y
+npx easy-command@2.0.4 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.3/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.4/install.sh | bash -s -- -y
 ```
 
 ## 许可

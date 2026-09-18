@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.3'
+readonly VERSION='2.0.4'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -11,9 +11,10 @@ ACTION='install'
 ASSUME_YES=false
 CHANGE_LOGIN_SHELL=true
 DRY_RUN=false
-ENABLE_ZOXIDE='auto'
+ENABLE_ZOXIDE=true
 ENABLE_FZF='auto'
 ENABLE_GIT_ALIASES='auto'
+GLOBAL_INSTALL=false
 TARGET_USER="${SUDO_USER:-${USER}}"
 TARGET_HOME=''
 
@@ -39,8 +40,9 @@ Options:
   --user USER         Configure this user. Defaults to the invoking user.
   --no-chsh           Do not change the user's default login shell to zsh.
   --dry-run           Preview changes without installing, writing files, or using sudo.
-  --with-zoxide       Enable optional zoxide directory jumping.
-  --without-zoxide    Disable zoxide in the managed configuration.
+  --global            Install this easy-command version globally with npm first.
+  --with-zoxide       Enable zoxide directory jumping (enabled by default).
+  --without-zoxide    Do not install or enable zoxide.
   --with-fzf          Enable optional fzf history and file searching.
   --without-fzf       Disable fzf in the managed configuration.
   --with-git-aliases  Add non-conflicting global Git aliases prefixed with ec-.
@@ -189,6 +191,17 @@ install_packages() {
     esac
 }
 
+install_global_package() {
+    "$GLOBAL_INSTALL" || return 0
+    command -v npm >/dev/null 2>&1 || fail 'npm is required for --global. Install Node.js/npm first.'
+
+    if "$DRY_RUN"; then
+        command_preview npm install -g "easy-command@$VERSION"
+    else
+        npm install -g "easy-command@$VERSION"
+    fi
+}
+
 ensure_repository() {
     local repository="$1"
     local destination="$2"
@@ -306,12 +319,56 @@ if command -v zoxide >/dev/null 2>&1; then
 
     # Keep zoxide's normal jump behavior and add a short command for recording paths.
     function z() {
-        if [[ "$1" == 'add' ]]; then
+        if [[ "$1" == 'add' || "$1" == 'a' ]]; then
             shift
             command zoxide add "$@"
         else
             __zoxide_z "$@"
         fi
+    }
+
+    # Unified easy-command directory interface. Keep z for zoxide compatibility.
+    function ec() {
+        case "$1" in
+            doctor|repair|update|install|uninstall)
+                if (( $+commands[easy-command] )); then
+                    command easy-command "$@"
+                else
+                    command npx easy-command "$@"
+                fi
+                ;;
+            --dry-run)
+                if (( $+commands[easy-command] )); then
+                    command easy-command "$@"
+                else
+                    command npx easy-command "$@"
+                fi
+                ;;
+            add|a)
+                shift
+                command zoxide add "$@"
+                ;;
+            list|ls|l)
+                shift
+                command zoxide query --list "$@"
+                ;;
+            del|remove)
+                shift
+                command zoxide remove "$@"
+                ;;
+            help|--help|-h)
+                printf '%s\n' \
+                    'Usage: ec <keyword>' \
+                    '       ec add|a <directory>' \
+                    '       ec list|ls|l [keyword]' \
+                    '       ec del|remove <directory>' \
+                    '       ec doctor|repair|update|install|uninstall' \
+                    '       ec --dry-run'
+                ;;
+            *)
+                __zoxide_z "$@"
+                ;;
+        esac
     }
 fi
 EOF
@@ -475,6 +532,7 @@ parse_args() {
                 ;;
             --no-chsh) CHANGE_LOGIN_SHELL=false ;;
             --dry-run) DRY_RUN=true ;;
+            --global) GLOBAL_INSTALL=true ;;
             --with-zoxide) ENABLE_ZOXIDE=true ;;
             --without-zoxide) ENABLE_ZOXIDE=false ;;
             --with-fzf) ENABLE_FZF=true ;;
@@ -508,6 +566,7 @@ main() {
             ;;
         install)
             confirm "Install easy-command $VERSION for $TARGET_USER?"
+            install_global_package
             install_packages
             ensure_repositories
             change_login_shell

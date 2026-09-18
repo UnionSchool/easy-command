@@ -10,10 +10,17 @@ Configure a polished Zsh terminal in one command.
 
 ## INSTALL
 
-### npm
+### npm (recommended)
 
 ```bash
-npx easy-command -y
+npm i -g easy-command
+easy-command -y
+```
+
+Or install globally and configure your terminal in one command:
+
+```bash
+npx easy-command -y --global
 ```
 
 ### GitHub
@@ -34,19 +41,19 @@ exec zsh -l
 
 ```bash
 # Preview installation without changing your machine
-npx easy-command --dry-run
+easy-command --dry-run
 
 # Check Shell, dependencies, managed repositories, and .zshrc configuration
-npx easy-command doctor
+easy-command doctor
 
 # Restore missing managed files and configuration
-npx easy-command repair -y
+easy-command repair -y
 
 # Safely update Oh My Zsh and managed plugins
-npx easy-command update -y
+easy-command update -y
 ```
 
-`npx` runs the command without a global npm installation. If you prefer the shorter `easy-command` command, install it globally with `npm install -g easy-command`.
+If you do not want a global npm installation, replace `easy-command` in the examples with `npx easy-command`.
 
 ## What you get
 
@@ -83,11 +90,13 @@ bash install.sh -y --no-chsh
 # Remove only the configuration block managed by easy-command
 bash install.sh --uninstall
 
-# Enable optional directory jumping, fuzzy search, and Git aliases
-bash install.sh -y --with-zoxide --with-fzf --with-git-aliases
+# Enable optional fuzzy search and Git aliases
+bash install.sh -y --with-fzf --with-git-aliases
 ```
 
-`zoxide` enables `z <keyword>` directory jumping and `z add <directory>` for manually recording a directory. `fzf` adds fuzzy history and file searching. Git aliases use the non-conflicting `ec-` prefix, such as `git ec-status`; existing aliases are never overwritten.
+`zoxide` is installed by default. It enables `z <keyword>` directory jumping and `z add <directory>` (or `z a <directory>`) for manually recording a directory. Use `--without-zoxide` to disable it. `fzf` adds fuzzy history and file searching. Git aliases use the non-conflicting `ec-` prefix, such as `git ec-status`; existing aliases are never overwritten.
+
+For a unified interface, use `ec <keyword>` to jump, `ec add <directory>` (or `ec a <directory>`) to record a directory, `ec list` (or `ec l`) to view entries, and `ec del <directory>` (or `ec remove <directory>`) to remove one. `ec doctor`, `ec repair`, `ec update`, `ec install`, `ec uninstall`, and `ec --dry-run` run the matching easy-command maintenance operation. `z` remains available for zoxide compatibility.
 
 ## Requirements
 
@@ -121,13 +130,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.3 -y
+npx easy-command@2.0.4 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.3/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.4/install.sh | bash -s -- -y
 ```
 
 ## License
