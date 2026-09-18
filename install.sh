@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.2'
+readonly VERSION='2.0.3'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -303,6 +303,16 @@ EOF
 # easy-command: zoxide
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh)"
+
+    # Keep zoxide's normal jump behavior and add a short command for recording paths.
+    function z() {
+        if [[ "$1" == 'add' ]]; then
+            shift
+            command zoxide add "$@"
+        else
+            __zoxide_z "$@"
+        fi
+    }
 fi
 EOF
     fi

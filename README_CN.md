@@ -87,7 +87,7 @@ bash install.sh --uninstall
 bash install.sh -y --with-zoxide --with-fzf --with-git-aliases
 ```
 
-`zoxide` 提供 `z <关键词>` 目录跳转；`fzf` 提供历史命令和文件的模糊搜索；Git 快捷操作使用 `ec-` 前缀，例如 `git ec-status`，不会覆盖已有别名。
+`zoxide` 提供 `z <关键词>` 目录跳转，也支持 `z add <目录>` 手动记录目录；`fzf` 提供历史命令和文件的模糊搜索；Git 快捷操作使用 `ec-` 前缀，例如 `git ec-status`，不会覆盖已有别名。
 
 ## 系统要求
 
@@ -121,13 +121,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.2 -y
+npx easy-command@2.0.3 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.2/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.3/install.sh | bash -s -- -y
 ```
 
 ## 许可

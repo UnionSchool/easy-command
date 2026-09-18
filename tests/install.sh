@@ -57,6 +57,7 @@ bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-zoxide --with-fzf --with-git-
 
 grep -Fqx '# personal setting' "$TEST_HOME/.zshrc"
 grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"
+grep -Fqx '    function z() {' "$TEST_HOME/.zshrc"
 grep -Fqx '# easy-command: fzf' "$TEST_HOME/.zshrc"
 [[ -d "$TEST_HOME/.easy-command/oh-my-zsh/.git" ]]
 

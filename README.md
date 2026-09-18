@@ -87,7 +87,7 @@ bash install.sh --uninstall
 bash install.sh -y --with-zoxide --with-fzf --with-git-aliases
 ```
 
-`zoxide` enables `z <keyword>` directory jumping. `fzf` adds fuzzy history and file searching. Git aliases use the non-conflicting `ec-` prefix, such as `git ec-status`; existing aliases are never overwritten.
+`zoxide` enables `z <keyword>` directory jumping and `z add <directory>` for manually recording a directory. `fzf` adds fuzzy history and file searching. Git aliases use the non-conflicting `ec-` prefix, such as `git ec-status`; existing aliases are never overwritten.
 
 ## Requirements
 
@@ -121,13 +121,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.2 -y
+npx easy-command@2.0.3 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.2/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.3/install.sh | bash -s -- -y
 ```
 
 ## License
