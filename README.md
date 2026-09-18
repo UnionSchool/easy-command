@@ -2,6 +2,20 @@
 
 一条命令配置统一的 Zsh 终端：Oh My Zsh、`agnoster` 主题、Git 状态、历史命令建议、Tab 补全与命令语法高亮。
 
+## 效果预览
+
+### Git 分支与工作区状态
+
+![agnoster 显示 Git 分支和工作区状态](assets/git-status.png)
+
+### 历史命令自动建议
+
+![输入时显示可接受的历史命令建议](assets/autosuggestions.png)
+
+### 命令语法高亮与错误提示
+
+![有效命令为绿色，未知命令为红色](assets/syntax-highlighting.png)
+
 ## 快速开始
 
 安装最新版本：
