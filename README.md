@@ -126,7 +126,7 @@ For production, pin a release tag instead of running `main` directly:
 > 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v1.0.1/install.sh | bash -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v1.0.3/install.sh | bash -s -- --yes
 ```
 
 ## License
