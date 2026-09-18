@@ -21,6 +21,7 @@ easy-command -y
 
 ```bash
 npx easy-command -y --global
+exec zsh -l
 ```
 
 ### GitHub 安装
@@ -130,13 +131,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.4 -y
+npx easy-command@2.0.5 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.4/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.5/install.sh | bash -s -- -y
 ```
 
 ## 许可

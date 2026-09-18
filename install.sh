@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.4'
+readonly VERSION='2.0.5'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -573,6 +573,9 @@ main() {
             write_zshrc_block
             configure_git_aliases
             info "Installed easy-command $VERSION for $TARGET_USER. Reconnect or run: exec zsh -l"
+            if "$GLOBAL_INSTALL"; then
+                info "Global CLI installed. After exec zsh -l, try: ec --help"
+            fi
             ;;
         repair)
             CHANGE_LOGIN_SHELL=false

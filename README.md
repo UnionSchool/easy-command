@@ -21,6 +21,7 @@ Or install globally and configure your terminal in one command:
 
 ```bash
 npx easy-command -y --global
+exec zsh -l
 ```
 
 ### GitHub
@@ -130,13 +131,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.4 -y
+npx easy-command@2.0.5 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.4/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.5/install.sh | bash -s -- -y
 ```
 
 ## License
