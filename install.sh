@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.1'
+readonly VERSION='2.0.2'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -110,7 +110,9 @@ write_file() {
 }
 
 determine_target_home() {
-    TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6 2>/dev/null || true)"
+    if command -v getent >/dev/null 2>&1; then
+        TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6 2>/dev/null || true)"
+    fi
     if [[ -z "$TARGET_HOME" && "$(uname -s)" == 'Darwin' ]]; then
         TARGET_HOME="$(dscl . -read "/Users/$TARGET_USER" NFSHomeDirectory | awk '{print $2}')"
     fi
@@ -364,7 +366,14 @@ change_login_shell() {
 
     local zsh_path
     zsh_path="$(command -v zsh)"
-    grep -qx "$zsh_path" /etc/shells || fail "$zsh_path is not listed in /etc/shells."
+    if ! grep -qx "$zsh_path" /etc/shells; then
+        if [[ -x /bin/zsh ]] && grep -qx '/bin/zsh' /etc/shells; then
+            warn "$zsh_path is not listed in /etc/shells; using /bin/zsh as the login shell."
+            zsh_path='/bin/zsh'
+        else
+            fail "$zsh_path is not listed in /etc/shells. Use --no-chsh or add the path to /etc/shells first."
+        fi
+    fi
     run_as_root chsh -s "$zsh_path" "$TARGET_USER"
 }
 
@@ -384,7 +393,9 @@ doctor() {
     local configured_shell=''
 
     info "Checking easy-command for $TARGET_USER"
-    configured_shell="$(getent passwd "$TARGET_USER" | cut -d: -f7 2>/dev/null || true)"
+    if command -v getent >/dev/null 2>&1; then
+        configured_shell="$(getent passwd "$TARGET_USER" | cut -d: -f7 2>/dev/null || true)"
+    fi
     if [[ -z "$configured_shell" && "$(uname -s)" == 'Darwin' ]]; then
         configured_shell="$(dscl . -read "/Users/$TARGET_USER" UserShell | awk '{print $2}')"
     fi
@@ -489,9 +500,9 @@ main() {
             confirm "Install easy-command $VERSION for $TARGET_USER?"
             install_packages
             ensure_repositories
+            change_login_shell
             write_zshrc_block
             configure_git_aliases
-            change_login_shell
             info "Installed easy-command $VERSION for $TARGET_USER. Reconnect or run: exec zsh -l"
             ;;
         repair)

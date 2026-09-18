@@ -21,6 +21,12 @@ if [[ "$1" == "passwd" ]]; then
     printf "easytest:x:501:20::%s:/bin/zsh\\n" "$EASY_COMMAND_TEST_HOME"
 fi'
 create_fake uname 'printf "Darwin\\n"'
+create_fake dscl '
+if [[ "$4" == "UserShell" ]]; then
+    printf "UserShell /bin/zsh\\n"
+else
+    printf "NFSHomeDirectory %s\\n" "$EASY_COMMAND_TEST_HOME"
+fi'
 create_fake brew '
 if [[ "$1" == "--prefix" ]]; then
     printf "%s\\n" "$EASY_COMMAND_TEST_HOME/homebrew"
@@ -54,6 +60,8 @@ grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"
 grep -Fqx '# easy-command: fzf' "$TEST_HOME/.zshrc"
 [[ -d "$TEST_HOME/.easy-command/oh-my-zsh/.git" ]]
 
+bash "$ROOT_DIR/install.sh" doctor
+mv "$FAKE_BIN/getent" "$FAKE_BIN/getent.disabled"
 bash "$ROOT_DIR/install.sh" doctor
 bash "$ROOT_DIR/install.sh" repair --yes --without-zoxide
 ! grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"

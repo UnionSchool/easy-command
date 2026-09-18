@@ -34,17 +34,19 @@ exec zsh -l
 
 ```bash
 # Preview installation without changing your machine
-easy-command --dry-run
+npx easy-command --dry-run
 
 # Check Shell, dependencies, managed repositories, and .zshrc configuration
-easy-command doctor
+npx easy-command doctor
 
 # Restore missing managed files and configuration
-easy-command repair -y
+npx easy-command repair -y
 
 # Safely update Oh My Zsh and managed plugins
-easy-command update -y
+npx easy-command update -y
 ```
+
+`npx` runs the command without a global npm installation. If you prefer the shorter `easy-command` command, install it globally with `npm install -g easy-command`.
 
 ## What you get
 
@@ -119,13 +121,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.1 -y
+npx easy-command@2.0.2 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.1/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.2/install.sh | bash -s -- -y
 ```
 
 ## License

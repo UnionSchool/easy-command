@@ -34,17 +34,19 @@ exec zsh -l
 
 ```bash
 # 预览安装过程，不修改本机环境
-easy-command --dry-run
+npx easy-command --dry-run
 
 # 检查 Shell、依赖、托管仓库和 .zshrc 配置
-easy-command doctor
+npx easy-command doctor
 
 # 恢复缺失的托管文件和配置
-easy-command repair -y
+npx easy-command repair -y
 
 # 安全更新 Oh My Zsh 和托管插件
-easy-command update -y
+npx easy-command update -y
 ```
+
+`npx` 无需全局安装即可运行命令。若希望直接使用更短的 `easy-command` 命令，可执行 `npm install -g easy-command`。
 
 ## 安装后即可使用
 
@@ -119,13 +121,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.1 -y
+npx easy-command@2.0.2 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.1/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.2/install.sh | bash -s -- -y
 ```
 
 ## 许可
