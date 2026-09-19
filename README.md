@@ -8,6 +8,8 @@ Configure a polished Zsh terminal in one command.
 
 `easy-command` installs and configures Oh My Zsh, the `agnoster` theme, Git status, command suggestions, Tab completion, and syntax highlighting. It preserves your existing `.zshrc` content and creates a backup before every change.
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
+
 ## INSTALL
 
 ### npm (recommended)
@@ -131,13 +133,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.8 -y
+npx easy-command@2.0.9 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.8/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.9/install.sh | bash -s -- -y
 ```
 
 ## License

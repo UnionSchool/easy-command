@@ -8,6 +8,8 @@
 
 `easy-command` 会安装并配置 Oh My Zsh、`agnoster` 主题、Git 状态、命令建议、Tab 补全和语法高亮。每次修改 `.zshrc` 前都会备份，并保留用户已有的配置内容。
 
+更新记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 安装
 
 ### npm 安装（推荐）
@@ -131,13 +133,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.8 -y
+npx easy-command@2.0.9 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.8/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.9/install.sh | bash -s -- -y
 ```
 
 ## 许可

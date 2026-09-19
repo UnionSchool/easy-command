@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.8'
+readonly VERSION='2.0.9'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'

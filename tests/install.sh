@@ -61,14 +61,14 @@ export EASY_COMMAND_TEST_GIT_CONFIG="$TEST_GIT_CONFIG"
 
 bash -n "$ROOT_DIR/install.sh"
 bash "$ROOT_DIR/install.sh" --help >/dev/null
-[[ "$(bash "$ROOT_DIR/install.sh" --version)" == '2.0.8' ]]
-[[ "$(bash "$ROOT_DIR/install.sh" -v)" == '2.0.8' ]]
+[[ "$(bash "$ROOT_DIR/install.sh" --version)" == '2.0.9' ]]
+[[ "$(bash "$ROOT_DIR/install.sh" -v)" == '2.0.9' ]]
 EASY_COMMAND_NPM_CLI=1 bash "$ROOT_DIR/install.sh" update --dry-run --yes --no-chsh | grep -F 'npm install -g easy-command@latest'
 
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
-bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.8"
+bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.9"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
 bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
