@@ -30,5 +30,8 @@ jobs:
           bash -n install.sh
           bash tests/install.sh
 
+      - name: Set up npm trusted publishing
+        run: npm install -g npm@^11.15.0
+
       - name: Publish package
         run: npm publish
