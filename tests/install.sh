@@ -89,7 +89,7 @@ grep -Fqx 'alias.lg=log --color --graph --pretty=format:'"'"'%Cred%h%Creset -%C(
 grep -Fqx 'alias.ec-status=status --short --branch' "$TEST_GIT_CONFIG"
 
 bash "$ROOT_DIR/install.sh" doctor
-mv "$FAKE_BIN/getent" "$FAKE_BIN/getent.disabled"
+create_fake getent 'exit 1'
 bash "$ROOT_DIR/install.sh" doctor
 bash "$ROOT_DIR/install.sh" repair --yes --without-zoxide
 ! grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"
