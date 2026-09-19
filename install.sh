@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.5'
+readonly VERSION='2.0.6'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -13,7 +13,7 @@ CHANGE_LOGIN_SHELL=true
 DRY_RUN=false
 ENABLE_ZOXIDE=true
 ENABLE_FZF='auto'
-ENABLE_GIT_ALIASES='auto'
+ENABLE_GIT_ALIASES=true
 GLOBAL_INSTALL=false
 TARGET_USER="${SUDO_USER:-${USER}}"
 TARGET_HOME=''
@@ -45,7 +45,7 @@ Options:
   --without-zoxide    Do not install or enable zoxide.
   --with-fzf          Enable optional fzf history and file searching.
   --without-fzf       Disable fzf in the managed configuration.
-  --with-git-aliases  Add non-conflicting global Git aliases prefixed with ec-.
+  --with-git-aliases  Add non-conflicting global Git aliases (default).
   --without-git-aliases
                     Remove global Git aliases managed by easy-command.
   --uninstall         Remove only the easy-command managed .zshrc block.
@@ -397,9 +397,29 @@ EOF
 
 configure_git_aliases() {
     local enabled
-    enabled="$(resolve_option "$ENABLE_GIT_ALIASES" 'git-aliases')"
+    enabled="$ENABLE_GIT_ALIASES"
 
     local aliases=(
+        'st=status'
+        'br=branch'
+        'bc=branch'
+        'sw=switch'
+        'cd=switch'
+        'ch=checkout'
+        'ck=checkout'
+        'ci=commit'
+        'ca=commit -a'
+        'cam=commit -a -m'
+        'co=commit'
+        'rb=rebase'
+        'rs=restore'
+        'rt=remote'
+        'mg=merge'
+        'rh=reset HEAD'
+        'last=log -1'
+        "lg=log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+        'la=log --pretty=oneline --abbrev-commit'
+        'lb=log --graph --pretty=oneline --abbrev-commit'
         'ec-status=status --short --branch'
         'ec-log=log --oneline --graph --decorate -12'
         'ec-last=log -1 --stat'

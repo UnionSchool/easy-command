@@ -91,11 +91,11 @@ bash install.sh -y --no-chsh
 # Remove only the configuration block managed by easy-command
 bash install.sh --uninstall
 
-# Enable optional fuzzy search and Git aliases
-bash install.sh -y --with-fzf --with-git-aliases
+# Enable optional fuzzy search
+bash install.sh -y --with-fzf
 ```
 
-`zoxide` is installed by default. It enables `z <keyword>` directory jumping and `z add <directory>` (or `z a <directory>`) for manually recording a directory. Use `--without-zoxide` to disable it. `fzf` adds fuzzy history and file searching. Git aliases use the non-conflicting `ec-` prefix, such as `git ec-status`; existing aliases are never overwritten.
+`zoxide` is installed by default. It enables `z <keyword>` directory jumping and `z add <directory>` (or `z a <directory>`) for manually recording a directory. Use `--without-zoxide` to disable it. `fzf` adds fuzzy history and file searching. Git aliases are added by default, including `git st`, `git br`, `git sw`, `git ci`, `git cam`, `git lg`, `git la`, `git lb`, and `git ec-status`; existing aliases are never overwritten. Use `--without-git-aliases` to skip or remove aliases managed by easy-command.
 
 For a unified interface, use `ec <keyword>` to jump, `ec add <directory>` (or `ec a <directory>`) to record a directory, `ec list` (or `ec l`) to view entries, and `ec del <directory>` (or `ec remove <directory>`) to remove one. `ec doctor`, `ec repair`, `ec update`, `ec install`, `ec uninstall`, and `ec --dry-run` run the matching easy-command maintenance operation. `z` remains available for zoxide compatibility.
 
@@ -131,13 +131,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.5 -y
+npx easy-command@2.0.6 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.5/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.6/install.sh | bash -s -- -y
 ```
 
 ## License
