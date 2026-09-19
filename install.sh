@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.7'
+readonly VERSION='2.0.8'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -48,6 +48,7 @@ Options:
   --with-git-aliases  Add non-conflicting global Git aliases (default).
   --without-git-aliases
                     Remove global Git aliases managed by easy-command.
+  --version, -v       Print the easy-command version.
   --uninstall         Remove only the easy-command managed .zshrc block.
   --help, -h          Show this help.
 EOF
@@ -202,6 +203,24 @@ install_global_package() {
     fi
 }
 
+update_global_package() {
+    [[ "${EASY_COMMAND_NPM_CLI:-}" == '1' ]] || return 0
+    [[ "${EASY_COMMAND_SELF_UPDATED:-}" != '1' ]] || return 0
+    command -v npm >/dev/null 2>&1 || {
+        warn 'npm is unavailable; skipped easy-command CLI upgrade.'
+        return 0
+    }
+
+    if "$DRY_RUN"; then
+        command_preview npm install -g easy-command@latest
+        return 0
+    fi
+
+    info 'Updating easy-command CLI to the latest npm version...'
+    npm install -g easy-command@latest || fail 'Unable to update easy-command CLI. Check npm permissions and registry settings, then retry.'
+    exec env EASY_COMMAND_NPM_CLI=1 EASY_COMMAND_SELF_UPDATED=1 easy-command update --yes --user "$TARGET_USER"
+}
+
 ensure_repository() {
     local repository="$1"
     local destination="$2"
@@ -344,7 +363,7 @@ if command -v zoxide >/dev/null 2>&1; then
                     command npx easy-command "$@"
                 fi
                 ;;
-            --dry-run)
+            --dry-run|-v|--version)
                 if (( $+commands[easy-command] )); then
                     command easy-command "$@"
                 else
@@ -567,6 +586,10 @@ parse_args() {
             --with-git-aliases) ENABLE_GIT_ALIASES=true ;;
             --without-git-aliases) ENABLE_GIT_ALIASES=false ;;
             --uninstall) ACTION='uninstall' ;;
+            --version|-v)
+                printf '%s\n' "$VERSION"
+                exit 0
+                ;;
             --help|-h)
                 usage
                 exit 0
@@ -616,6 +639,7 @@ main() {
         update)
             CHANGE_LOGIN_SHELL=false
             confirm "Update easy-command repositories for $TARGET_USER?"
+            update_global_package
             ensure_repositories
             update_repositories
             write_zshrc_block

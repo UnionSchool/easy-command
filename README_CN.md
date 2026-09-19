@@ -131,13 +131,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.7 -y
+npx easy-command@2.0.8 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.7/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.8/install.sh | bash -s -- -y
 ```
 
 ## 许可

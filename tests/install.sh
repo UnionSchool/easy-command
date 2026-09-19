@@ -61,11 +61,14 @@ export EASY_COMMAND_TEST_GIT_CONFIG="$TEST_GIT_CONFIG"
 
 bash -n "$ROOT_DIR/install.sh"
 bash "$ROOT_DIR/install.sh" --help >/dev/null
+[[ "$(bash "$ROOT_DIR/install.sh" --version)" == '2.0.8' ]]
+[[ "$(bash "$ROOT_DIR/install.sh" -v)" == '2.0.8' ]]
+EASY_COMMAND_NPM_CLI=1 bash "$ROOT_DIR/install.sh" update --dry-run --yes --no-chsh | grep -F 'npm install -g easy-command@latest'
 
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
-bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.7"
+bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.8"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
 bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
@@ -78,6 +81,7 @@ grep -Fqx '    function z() {' "$TEST_HOME/.zshrc"
 grep -Fqx '        if [[ "$1" == '\''add'\'' || "$1" == '\''a'\'' ]]; then' "$TEST_HOME/.zshrc"
 grep -Fqx '    function ec() {' "$TEST_HOME/.zshrc"
 grep -Fqx '                __easy_command_jump "$@"' "$TEST_HOME/.zshrc"
+grep -Fqx '            --dry-run|-v|--version)' "$TEST_HOME/.zshrc"
 grep -Fqx '            doctor|repair|update|install|uninstall)' "$TEST_HOME/.zshrc"
 grep -Fqx '            list|ls|l)' "$TEST_HOME/.zshrc"
 grep -Fqx '            del|remove)' "$TEST_HOME/.zshrc"

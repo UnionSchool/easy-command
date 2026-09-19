@@ -1,6 +1,6 @@
 {
   "name": "easy-command",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Configure a polished Zsh terminal with one command.",
   "license": "MIT",
   "bin": {

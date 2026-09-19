@@ -131,13 +131,13 @@ bash install.sh -y
 For production, pin a release tag instead of running `main` directly:
 
 ```bash
-npx easy-command@2.0.7 -y
+npx easy-command@2.0.8 -y
 ```
 
 Or, without npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.7/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.8/install.sh | bash -s -- -y
 ```
 
 ## License

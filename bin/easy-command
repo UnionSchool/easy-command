@@ -10,4 +10,4 @@ while [[ -h "$source_path" ]]; do
 done
 
 package_directory="$(cd -P "$(dirname "$source_path")/.." && pwd)"
-exec "$package_directory/install.sh" "$@"
+exec env EASY_COMMAND_NPM_CLI=1 "$package_directory/install.sh" "$@"
