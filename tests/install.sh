@@ -52,7 +52,8 @@ bash "$ROOT_DIR/install.sh" --help >/dev/null
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
-bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.5"
+PACKAGE_VERSION="$(grep -m1 '"version"' "$ROOT_DIR/package.json" | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
+bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@$PACKAGE_VERSION"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
 bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
