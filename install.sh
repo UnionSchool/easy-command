@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.6'
+readonly VERSION='2.0.7'
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -315,15 +315,22 @@ EOF
 
 # easy-command: zoxide
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
+    # Paths are recorded only through `ec add` / `ec a`; never implicitly after cd.
+    eval "$(zoxide init zsh --no-cmd --hook none)"
 
-    # Keep zoxide's normal jump behavior and add a short command for recording paths.
+    function __easy_command_jump() {
+        local target
+        target="$(command zoxide query --exclude "$PWD" -- "$@")" || return 1
+        builtin cd -- "$target"
+    }
+
+    # Keep z for zoxide compatibility, but record paths only when explicitly requested.
     function z() {
         if [[ "$1" == 'add' || "$1" == 'a' ]]; then
             shift
             command zoxide add "$@"
         else
-            __zoxide_z "$@"
+            __easy_command_jump "$@"
         fi
     }
 
@@ -366,7 +373,7 @@ if command -v zoxide >/dev/null 2>&1; then
                     '       ec --dry-run'
                 ;;
             *)
-                __zoxide_z "$@"
+                __easy_command_jump "$@"
                 ;;
         esac
     }

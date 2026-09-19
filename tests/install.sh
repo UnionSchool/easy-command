@@ -65,16 +65,19 @@ bash "$ROOT_DIR/install.sh" --help >/dev/null
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
-bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.6"
+bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.7"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
 bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
 
 grep -Fqx '# personal setting' "$TEST_HOME/.zshrc"
 grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"
+grep -Fqx '    eval "$(zoxide init zsh --no-cmd --hook none)"' "$TEST_HOME/.zshrc"
+grep -Fqx '    function __easy_command_jump() {' "$TEST_HOME/.zshrc"
 grep -Fqx '    function z() {' "$TEST_HOME/.zshrc"
 grep -Fqx '        if [[ "$1" == '\''add'\'' || "$1" == '\''a'\'' ]]; then' "$TEST_HOME/.zshrc"
 grep -Fqx '    function ec() {' "$TEST_HOME/.zshrc"
+grep -Fqx '                __easy_command_jump "$@"' "$TEST_HOME/.zshrc"
 grep -Fqx '            doctor|repair|update|install|uninstall)' "$TEST_HOME/.zshrc"
 grep -Fqx '            list|ls|l)' "$TEST_HOME/.zshrc"
 grep -Fqx '            del|remove)' "$TEST_HOME/.zshrc"

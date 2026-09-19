@@ -95,7 +95,7 @@ bash install.sh --uninstall
 bash install.sh -y --with-fzf
 ```
 
-默认安装 `zoxide`，可使用 `z <关键词>` 跳转目录，也支持 `z add <目录>` 或 `z a <目录>` 手动记录目录；使用 `--without-zoxide` 可关闭。`fzf` 提供历史命令和文件的模糊搜索；默认添加 Git 快捷操作，包括 `git st`、`git br`、`git sw`、`git ci`、`git cam`、`git lg`、`git la`、`git lb` 和 `git ec-status` 等，不会覆盖已有同名别名。使用 `--without-git-aliases` 可跳过或移除项目管理的快捷方式。
+默认安装 `zoxide`，可使用 `z <关键词>` 跳转目录，也支持 `z add <目录>` 或 `z a <目录>` 手动记录目录；目录仅会通过 `z add`、`z a`、`ec add` 或 `ec a` 显式记录，普通跳转不会自动添加目录。使用 `--without-zoxide` 可关闭。`fzf` 提供历史命令和文件的模糊搜索；默认添加 Git 快捷操作，包括 `git st`、`git br`、`git sw`、`git ci`、`git cam`、`git lg`、`git la`、`git lb` 和 `git ec-status` 等，不会覆盖已有同名别名。使用 `--without-git-aliases` 可跳过或移除项目管理的快捷方式。
 
 统一入口使用 `ec`：`ec <关键词>` 跳转目录，`ec add <目录>` 或 `ec a <目录>` 记录目录，`ec list` 或 `ec l` 查看记录，`ec del <目录>` 或 `ec remove <目录>` 删除记录；`ec doctor`、`ec repair`、`ec update`、`ec install`、`ec uninstall` 和 `ec --dry-run` 执行对应的 easy-command 维护操作。为兼容 zoxide，原有 `z` 命令仍可使用。
 
@@ -131,13 +131,13 @@ bash install.sh -y
 生产环境建议固定到发布标签，而不是直接使用 `main`：
 
 ```bash
-npx easy-command@2.0.6 -y
+npx easy-command@2.0.7 -y
 ```
 
 或者不使用 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.6/install.sh | bash -s -- -y
+curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.0.7/install.sh | bash -s -- -y
 ```
 
 ## 许可
