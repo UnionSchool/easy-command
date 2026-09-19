@@ -2,7 +2,13 @@
 
 set -Eeuo pipefail
 
-readonly VERSION='2.0.5'
+readonly SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly PACKAGE_JSON="$SCRIPT_DIR/package.json"
+if [[ -f "$PACKAGE_JSON" ]]; then
+    readonly VERSION="$(grep -m1 '"version"' "$PACKAGE_JSON" | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
+else
+    readonly VERSION='unknown'
+fi
 readonly BEGIN_MARKER='# >>> easy-command zsh >>>'
 readonly END_MARKER='# <<< easy-command zsh <<<'
 readonly BASE_DIR_NAME='.easy-command'
@@ -111,13 +117,22 @@ write_file() {
     chown "$TARGET_USER" "$destination_file" 2>/dev/null || true
 }
 
-determine_target_home() {
+resolve_user_field() {
+    local getent_field="$1"
+    local dscl_key="$2"
+    local value=''
+
     if command -v getent >/dev/null 2>&1; then
-        TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6 2>/dev/null || true)"
+        value="$(getent passwd "$TARGET_USER" | cut -d: -f"$getent_field" 2>/dev/null || true)"
     fi
-    if [[ -z "$TARGET_HOME" && "$(uname -s)" == 'Darwin' ]]; then
-        TARGET_HOME="$(dscl . -read "/Users/$TARGET_USER" NFSHomeDirectory | awk '{print $2}')"
+    if [[ -z "$value" && "$(uname -s)" == 'Darwin' ]]; then
+        value="$(dscl . -read "/Users/$TARGET_USER" "$dscl_key" 2>/dev/null | awk '{print $2}')"
     fi
+    printf '%s' "$value"
+}
+
+determine_target_home() {
+    TARGET_HOME="$(resolve_user_field 6 NFSHomeDirectory)"
     [[ -n "$TARGET_HOME" && -d "$TARGET_HOME" ]] || fail "Cannot determine home directory for $TARGET_USER."
 }
 
@@ -125,12 +140,8 @@ backup_file() {
     local file="$1"
     [[ -f "$file" ]] || return 0
 
-    local backup="${file}.easy-command-backup-$(date +%Y%m%d%H%M%S)"
-    local sequence=1
-    while [[ -e "$backup" ]]; do
-        backup="${file}.easy-command-backup-$(date +%Y%m%d%H%M%S)-${sequence}"
-        sequence=$((sequence + 1))
-    done
+    local backup
+    backup="$(mktemp -u "${file}.easy-command-backup-XXXXXX")"
     if "$DRY_RUN"; then
         command_preview cp "$file" "$backup"
     else
@@ -140,14 +151,32 @@ backup_file() {
     info "Backed up $file to $backup"
 }
 
-managed_block_is_valid() {
+managed_block_marker_counts() {
     local zshrc="$TARGET_HOME/.zshrc"
-    [[ -f "$zshrc" ]] || return 0
+    if [[ -f "$zshrc" ]]; then
+        MANAGED_BLOCK_BEGIN_COUNT="$(grep -Fxc "$BEGIN_MARKER" "$zshrc" || true)"
+        MANAGED_BLOCK_END_COUNT="$(grep -Fxc "$END_MARKER" "$zshrc" || true)"
+    else
+        MANAGED_BLOCK_BEGIN_COUNT=0
+        MANAGED_BLOCK_END_COUNT=0
+    fi
+}
 
-    local begin_count end_count
-    begin_count="$(grep -Fxc "$BEGIN_MARKER" "$zshrc" || true)"
-    end_count="$(grep -Fxc "$END_MARKER" "$zshrc" || true)"
-    [[ "$begin_count" == '0' && "$end_count" == '0' ]] || [[ "$begin_count" == '1' && "$end_count" == '1' ]]
+managed_block_is_valid() {
+    managed_block_marker_counts
+    [[ "$MANAGED_BLOCK_BEGIN_COUNT" == '0' && "$MANAGED_BLOCK_END_COUNT" == '0' ]] || \
+        [[ "$MANAGED_BLOCK_BEGIN_COUNT" == '1' && "$MANAGED_BLOCK_END_COUNT" == '1' ]]
+}
+
+strip_managed_block() {
+    local source_file="$1"
+    local destination_file="$2"
+
+    awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" '
+        $0 == begin { skipping = 1; next }
+        $0 == end { skipping = 0; next }
+        !skipping { print }
+    ' "$source_file" > "$destination_file"
 }
 
 managed_option_enabled() {
@@ -226,25 +255,43 @@ update_repository() {
     local destination="$1"
     [[ -d "$destination/.git" ]] || return 0
 
-    if ! run_as_user git -C "$destination" diff --quiet --ignore-submodules --; then
-        warn "Skipped $destination because it has local changes."
-        return 0
+    if ! run_as_user git -C "$destination" pull --ff-only; then
+        warn "Skipped $destination because it could not be fast-forwarded (local changes or diverged history)."
     fi
-    run_as_user git -C "$destination" pull --ff-only
 }
 
 ensure_repositories() {
     local base_dir="$TARGET_HOME/$BASE_DIR_NAME"
+    local pids=()
+
     ensure_repository 'https://github.com/ohmyzsh/ohmyzsh.git' "$base_dir/oh-my-zsh"
-    ensure_repository 'https://github.com/zsh-users/zsh-autosuggestions.git' "$base_dir/oh-my-zsh/custom/plugins/zsh-autosuggestions"
-    ensure_repository 'https://github.com/zsh-users/zsh-syntax-highlighting.git' "$base_dir/oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+
+    ensure_repository 'https://github.com/zsh-users/zsh-autosuggestions.git' "$base_dir/oh-my-zsh/custom/plugins/zsh-autosuggestions" &
+    pids+=("$!")
+    ensure_repository 'https://github.com/zsh-users/zsh-syntax-highlighting.git' "$base_dir/oh-my-zsh/custom/plugins/zsh-syntax-highlighting" &
+    pids+=("$!")
+
+    local pid
+    for pid in "${pids[@]}"; do
+        wait "$pid" || fail 'Failed to clone one or more plugin repositories.'
+    done
 }
 
 update_repositories() {
     local base_dir="$TARGET_HOME/$BASE_DIR_NAME/oh-my-zsh"
-    update_repository "$base_dir"
-    update_repository "$base_dir/custom/plugins/zsh-autosuggestions"
-    update_repository "$base_dir/custom/plugins/zsh-syntax-highlighting"
+    local pids=()
+
+    update_repository "$base_dir" &
+    pids+=("$!")
+    update_repository "$base_dir/custom/plugins/zsh-autosuggestions" &
+    pids+=("$!")
+    update_repository "$base_dir/custom/plugins/zsh-syntax-highlighting" &
+    pids+=("$!")
+
+    local pid
+    for pid in "${pids[@]}"; do
+        wait "$pid" || fail 'Failed to update one or more repositories.'
+    done
 }
 
 remove_managed_block() {
@@ -259,11 +306,7 @@ remove_managed_block() {
 
     local temp_file
     temp_file="$(mktemp)"
-    awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" '
-        $0 == begin { skipping = 1; next }
-        $0 == end { skipping = 0; next }
-        !skipping { print }
-    ' "$zshrc" > "$temp_file"
+    strip_managed_block "$zshrc" "$temp_file"
     write_file "$temp_file" "$zshrc"
     rm -f "$temp_file"
 }
@@ -280,11 +323,7 @@ write_zshrc_block() {
     local temp_file
     temp_file="$(mktemp)"
 
-    [[ -f "$zshrc" ]] && awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" '
-        $0 == begin { skipping = 1; next }
-        $0 == end { skipping = 0; next }
-        !skipping { print }
-    ' "$zshrc" > "$temp_file"
+    [[ -f "$zshrc" ]] && strip_managed_block "$zshrc" "$temp_file"
 
     cat >> "$temp_file" <<EOF
 
@@ -460,12 +499,7 @@ doctor() {
     local configured_shell=''
 
     info "Checking easy-command for $TARGET_USER"
-    if command -v getent >/dev/null 2>&1; then
-        configured_shell="$(getent passwd "$TARGET_USER" | cut -d: -f7 2>/dev/null || true)"
-    fi
-    if [[ -z "$configured_shell" && "$(uname -s)" == 'Darwin' ]]; then
-        configured_shell="$(dscl . -read "/Users/$TARGET_USER" UserShell | awk '{print $2}')"
-    fi
+    configured_shell="$(resolve_user_field 7 UserShell)"
     if [[ "$configured_shell" == *zsh ]]; then
         ok "Login shell: $configured_shell"
     else
@@ -492,15 +526,11 @@ doctor() {
         fi
     done
 
-    local begin_count=0 end_count=0
-    if [[ -f "$zshrc" ]]; then
-        begin_count="$(grep -Fxc "$BEGIN_MARKER" "$zshrc" || true)"
-        end_count="$(grep -Fxc "$END_MARKER" "$zshrc" || true)"
-    fi
-    if [[ "$begin_count" == '1' && "$end_count" == '1' ]]; then
+    managed_block_marker_counts
+    if [[ "$MANAGED_BLOCK_BEGIN_COUNT" == '1' && "$MANAGED_BLOCK_END_COUNT" == '1' ]]; then
         ok 'Managed .zshrc block is complete.'
     else
-        check_error "Managed .zshrc block is invalid (begin: $begin_count, end: $end_count). Restore a backup or repair the markers manually."
+        check_error "Managed .zshrc block is invalid (begin: $MANAGED_BLOCK_BEGIN_COUNT, end: $MANAGED_BLOCK_END_COUNT). Restore a backup or repair the markers manually."
         errors=$((errors + 1))
     fi
 

@@ -6,6 +6,9 @@
   "bin": {
     "easy-command": "bin/easy-command"
   },
+  "scripts": {
+    "test": "bash tests/install.sh"
+  },
   "files": [
     "bin",
     "assets",
