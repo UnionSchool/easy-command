@@ -91,6 +91,9 @@ bash install.sh -y --no-chsh
 # Remove only the configuration block managed by easy-command
 bash install.sh --uninstall
 
+# Remove the configuration block, Oh My Zsh, managed plugins, and command history
+bash install.sh --purge
+
 # Enable optional fuzzy search and Git aliases
 bash install.sh -y --with-fzf --with-git-aliases
 ```
@@ -102,13 +105,13 @@ For a unified interface, use `ec <keyword>` to jump, `ec add <directory>` (or `e
 ## Requirements
 
 - macOS: Homebrew must already be installed.
-- Ubuntu / Debian: dependencies are installed with `apt-get`.
+- Linux: dependencies are installed with `apt-get`, `dnf`, `pacman`, or `zypper`, whichever is available.
 
 The script needs `sudo` to install packages and change the default shell. Without sudo access, use `--no-chsh` and have an administrator install Zsh first.
 
 ## Configuration and rollback
 
-The installer manages only the marked `easy-command` block in `~/.zshrc`. Before each update, it creates a timestamped backup. Running `--uninstall` removes only that managed block; it does not remove Oh My Zsh, plugins, command history, or other personal settings.
+The installer manages only the marked `easy-command` block in `~/.zshrc`. Before each update, it creates a timestamped backup. Running `--uninstall` removes only that managed block; it does not remove Oh My Zsh, plugins, command history, or other personal settings. Running `--purge` removes the managed block as well as Oh My Zsh, managed plugins, and command history.
 
 Installed components:
 

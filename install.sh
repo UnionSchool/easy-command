@@ -21,6 +21,7 @@ ENABLE_ZOXIDE=true
 ENABLE_FZF='auto'
 ENABLE_GIT_ALIASES='auto'
 GLOBAL_INSTALL=false
+PURGE=false
 TARGET_USER="${SUDO_USER:-${USER}}"
 TARGET_HOME=''
 
@@ -55,6 +56,8 @@ Options:
   --without-git-aliases
                     Remove global Git aliases managed by easy-command.
   --uninstall         Remove only the easy-command managed .zshrc block.
+  --purge             Remove the managed .zshrc block, Oh My Zsh, managed
+                    plugins, and command history installed by easy-command.
   --help, -h          Show this help.
 EOF
 }
@@ -212,9 +215,18 @@ install_packages() {
             run_as_user brew install "${packages[@]}"
             ;;
         Linux)
-            command -v apt-get >/dev/null 2>&1 || fail 'Only Ubuntu/Debian (apt-get) is supported on Linux.'
-            run_as_root apt-get update
-            run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "${packages[@]}"
+            if command -v apt-get >/dev/null 2>&1; then
+                run_as_root apt-get update
+                run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "${packages[@]}"
+            elif command -v dnf >/dev/null 2>&1; then
+                run_as_root dnf install -y "${packages[@]}"
+            elif command -v pacman >/dev/null 2>&1; then
+                run_as_root pacman -Sy --noconfirm "${packages[@]}"
+            elif command -v zypper >/dev/null 2>&1; then
+                run_as_root zypper --non-interactive install "${packages[@]}"
+            else
+                fail 'No supported package manager found (apt-get, dnf, pacman, or zypper).'
+            fi
             ;;
         *) fail "Unsupported operating system: $(uname -s)" ;;
     esac
@@ -309,6 +321,19 @@ remove_managed_block() {
     strip_managed_block "$zshrc" "$temp_file"
     write_file "$temp_file" "$zshrc"
     rm -f "$temp_file"
+}
+
+purge_installed_files() {
+    local base_dir="$TARGET_HOME/$BASE_DIR_NAME"
+    local history_file="$TARGET_HOME/.zsh_history"
+
+    if "$DRY_RUN"; then
+        command_preview rm -rf "$base_dir"
+        command_preview rm -f "$history_file"
+        return
+    fi
+    rm -rf "$base_dir"
+    rm -f "$history_file"
 }
 
 write_zshrc_block() {
@@ -570,6 +595,10 @@ parse_args() {
             --with-git-aliases) ENABLE_GIT_ALIASES=true ;;
             --without-git-aliases) ENABLE_GIT_ALIASES=false ;;
             --uninstall) ACTION='uninstall' ;;
+            --purge)
+                ACTION='uninstall'
+                PURGE=true
+                ;;
             --help|-h)
                 usage
                 exit 0
@@ -589,10 +618,18 @@ main() {
             doctor
             ;;
         uninstall)
-            confirm "Remove the easy-command managed configuration for $TARGET_USER?"
+            if "$PURGE"; then
+                confirm "Remove the easy-command managed configuration AND all installed files (Oh My Zsh, plugins, command history) for $TARGET_USER?"
+            else
+                confirm "Remove the easy-command managed configuration for $TARGET_USER?"
+            fi
             backup_file "$TARGET_HOME/.zshrc"
             remove_managed_block
             info 'Removed the easy-command managed .zshrc block.'
+            if "$PURGE"; then
+                purge_installed_files
+                info 'Removed Oh My Zsh, managed plugins, and command history.'
+            fi
             ;;
         install)
             confirm "Install easy-command $VERSION for $TARGET_USER?"

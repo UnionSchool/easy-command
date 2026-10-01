@@ -80,6 +80,12 @@ bash "$ROOT_DIR/install.sh" --uninstall --yes
 grep -Fqx '# personal setting' "$TEST_HOME/.zshrc"
 ! grep -Fq '# >>> easy-command zsh >>>' "$TEST_HOME/.zshrc"
 
+bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
+[[ -d "$TEST_HOME/.easy-command/oh-my-zsh/.git" ]]
+bash "$ROOT_DIR/install.sh" --purge --yes
+[[ ! -e "$TEST_HOME/.easy-command" ]]
+! grep -Fq '# >>> easy-command zsh >>>' "$TEST_HOME/.zshrc"
+
 printf '%s\n' '# >>> easy-command zsh >>>' > "$TEST_HOME/.zshrc"
 if bash "$ROOT_DIR/install.sh" repair --yes >/dev/null 2>&1; then
     printf 'repair should reject an incomplete managed block\n' >&2
