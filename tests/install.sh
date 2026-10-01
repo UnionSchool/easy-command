@@ -70,7 +70,7 @@ grep -Fqx '# easy-command: fzf' "$TEST_HOME/.zshrc"
 [[ -d "$TEST_HOME/.easy-command/oh-my-zsh/.git" ]]
 
 bash "$ROOT_DIR/install.sh" doctor
-mv "$FAKE_BIN/getent" "$FAKE_BIN/getent.disabled"
+create_fake getent 'exit 1'
 bash "$ROOT_DIR/install.sh" doctor
 bash "$ROOT_DIR/install.sh" repair --yes --without-zoxide
 ! grep -Fqx '# easy-command: zoxide' "$TEST_HOME/.zshrc"
