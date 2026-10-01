@@ -2,6 +2,15 @@
 
 All notable changes to easy-command are documented here.
 
+## 2.1.0 - 2026-10-01
+
+- Linux package installation now falls back through `apt-get`, `dnf`, `pacman`, and `zypper` instead of requiring `apt-get`.
+- Added `--purge`, which removes the managed `.zshrc` block plus Oh My Zsh, managed plugins, and command history.
+- Deduplicated managed-block marker checks, the `.zshrc` block stripping logic, and the macOS/Linux user lookup helpers.
+- Plugin repositories are cloned and updated in parallel instead of serially.
+- `VERSION` is now derived from `package.json` instead of being hardcoded.
+- Wired `tests/install.sh` into `npm test`.
+
 ## 2.0.9 - 2026-09-20
 
 - Added a bundled changelog and linked it from both README files.

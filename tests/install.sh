@@ -59,16 +59,17 @@ export PATH="$FAKE_BIN:$PATH"
 export EASY_COMMAND_TEST_HOME="$TEST_HOME"
 export EASY_COMMAND_TEST_GIT_CONFIG="$TEST_GIT_CONFIG"
 
+PACKAGE_VERSION="$(grep -m1 '"version"' "$ROOT_DIR/package.json" | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
+
 bash -n "$ROOT_DIR/install.sh"
 bash "$ROOT_DIR/install.sh" --help >/dev/null
-[[ "$(bash "$ROOT_DIR/install.sh" --version)" == '2.0.9' ]]
-[[ "$(bash "$ROOT_DIR/install.sh" -v)" == '2.0.9' ]]
+[[ "$(bash "$ROOT_DIR/install.sh" --version)" == "$PACKAGE_VERSION" ]]
+[[ "$(bash "$ROOT_DIR/install.sh" -v)" == "$PACKAGE_VERSION" ]]
 EASY_COMMAND_NPM_CLI=1 bash "$ROOT_DIR/install.sh" update --dry-run --yes --no-chsh | grep -F 'npm install -g easy-command@latest'
 
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
-PACKAGE_VERSION="$(grep -m1 '"version"' "$ROOT_DIR/package.json" | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@$PACKAGE_VERSION"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
