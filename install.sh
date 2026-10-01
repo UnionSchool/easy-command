@@ -19,7 +19,7 @@ CHANGE_LOGIN_SHELL=true
 DRY_RUN=false
 ENABLE_ZOXIDE=true
 ENABLE_FZF='auto'
-ENABLE_GIT_ALIASES='auto'
+ENABLE_GIT_ALIASES=true
 GLOBAL_INSTALL=false
 PURGE=false
 TARGET_USER="${SUDO_USER:-${USER}}"
@@ -52,9 +52,10 @@ Options:
   --without-zoxide    Do not install or enable zoxide.
   --with-fzf          Enable optional fzf history and file searching.
   --without-fzf       Disable fzf in the managed configuration.
-  --with-git-aliases  Add non-conflicting global Git aliases prefixed with ec-.
+  --with-git-aliases  Add non-conflicting global Git aliases (default).
   --without-git-aliases
                     Remove global Git aliases managed by easy-command.
+  --version, -v       Print the easy-command version.
   --uninstall         Remove only the easy-command managed .zshrc block.
   --purge             Remove the managed .zshrc block, Oh My Zsh, managed
                     plugins, and command history installed by easy-command.
@@ -243,6 +244,24 @@ install_global_package() {
     fi
 }
 
+update_global_package() {
+    [[ "${EASY_COMMAND_NPM_CLI:-}" == '1' ]] || return 0
+    [[ "${EASY_COMMAND_SELF_UPDATED:-}" != '1' ]] || return 0
+    command -v npm >/dev/null 2>&1 || {
+        warn 'npm is unavailable; skipped easy-command CLI upgrade.'
+        return 0
+    }
+
+    if "$DRY_RUN"; then
+        command_preview npm install -g easy-command@latest
+        return 0
+    fi
+
+    info 'Updating easy-command CLI to the latest npm version...'
+    npm install -g easy-command@latest || fail 'Unable to update easy-command CLI. Check npm permissions and registry settings, then retry.'
+    exec env EASY_COMMAND_NPM_CLI=1 EASY_COMMAND_SELF_UPDATED=1 easy-command update --yes --user "$TARGET_USER"
+}
+
 ensure_repository() {
     local repository="$1"
     local destination="$2"
@@ -379,15 +398,22 @@ EOF
 
 # easy-command: zoxide
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
+    # Paths are recorded only through `ec add` / `ec a`; never implicitly after cd.
+    eval "$(zoxide init zsh --no-cmd --hook none)"
 
-    # Keep zoxide's normal jump behavior and add a short command for recording paths.
+    function __easy_command_jump() {
+        local target
+        target="$(command zoxide query --exclude "$PWD" -- "$@")" || return 1
+        builtin cd -- "$target"
+    }
+
+    # Keep z for zoxide compatibility, but record paths only when explicitly requested.
     function z() {
         if [[ "$1" == 'add' || "$1" == 'a' ]]; then
             shift
             command zoxide add "$@"
         else
-            __zoxide_z "$@"
+            __easy_command_jump "$@"
         fi
     }
 
@@ -401,7 +427,7 @@ if command -v zoxide >/dev/null 2>&1; then
                     command npx easy-command "$@"
                 fi
                 ;;
-            --dry-run)
+            --dry-run|-v|--version)
                 if (( $+commands[easy-command] )); then
                     command easy-command "$@"
                 else
@@ -430,7 +456,7 @@ if command -v zoxide >/dev/null 2>&1; then
                     '       ec --dry-run'
                 ;;
             *)
-                __zoxide_z "$@"
+                __easy_command_jump "$@"
                 ;;
         esac
     }
@@ -461,9 +487,29 @@ EOF
 
 configure_git_aliases() {
     local enabled
-    enabled="$(resolve_option "$ENABLE_GIT_ALIASES" 'git-aliases')"
+    enabled="$ENABLE_GIT_ALIASES"
 
     local aliases=(
+        'st=status'
+        'br=branch'
+        'bc=branch'
+        'sw=switch'
+        'cd=switch'
+        'ch=checkout'
+        'ck=checkout'
+        'ci=commit'
+        'ca=commit -a'
+        'cam=commit -a -m'
+        'co=commit'
+        'rb=rebase'
+        'rs=restore'
+        'rt=remote'
+        'mg=merge'
+        'rh=reset HEAD'
+        'last=log -1'
+        "lg=log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+        'la=log --pretty=oneline --abbrev-commit'
+        'lb=log --graph --pretty=oneline --abbrev-commit'
         'ec-status=status --short --branch'
         'ec-log=log --oneline --graph --decorate -12'
         'ec-last=log -1 --stat'
@@ -599,6 +645,10 @@ parse_args() {
                 ACTION='uninstall'
                 PURGE=true
                 ;;
+            --version|-v)
+                printf '%s\n' "$VERSION"
+                exit 0
+                ;;
             --help|-h)
                 usage
                 exit 0
@@ -656,6 +706,7 @@ main() {
         update)
             CHANGE_LOGIN_SHELL=false
             confirm "Update easy-command repositories for $TARGET_USER?"
+            update_global_package
             ensure_repositories
             update_repositories
             write_zshrc_block
