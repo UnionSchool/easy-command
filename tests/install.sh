@@ -68,7 +68,8 @@ EASY_COMMAND_NPM_CLI=1 bash "$ROOT_DIR/install.sh" update --dry-run --yes --no-c
 bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh
 [[ ! -e "$TEST_HOME/.zshrc" ]]
 [[ ! -e "$TEST_HOME/.easy-command" ]]
-bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@2.0.9"
+PACKAGE_VERSION="$(grep -m1 '"version"' "$ROOT_DIR/package.json" | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
+bash "$ROOT_DIR/install.sh" --dry-run --yes --no-chsh --global | grep -F "npm install -g easy-command@$PACKAGE_VERSION"
 
 printf '%s\n' '# personal setting' > "$TEST_HOME/.zshrc"
 bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
@@ -101,6 +102,12 @@ bash "$ROOT_DIR/install.sh" update --yes
 bash "$ROOT_DIR/install.sh" --uninstall --yes
 
 grep -Fqx '# personal setting' "$TEST_HOME/.zshrc"
+! grep -Fq '# >>> easy-command zsh >>>' "$TEST_HOME/.zshrc"
+
+bash "$ROOT_DIR/install.sh" --yes --no-chsh --with-fzf --with-git-aliases
+[[ -d "$TEST_HOME/.easy-command/oh-my-zsh/.git" ]]
+bash "$ROOT_DIR/install.sh" --purge --yes
+[[ ! -e "$TEST_HOME/.easy-command" ]]
 ! grep -Fq '# >>> easy-command zsh >>>' "$TEST_HOME/.zshrc"
 
 printf '%s\n' '# >>> easy-command zsh >>>' > "$TEST_HOME/.zshrc"

@@ -93,6 +93,9 @@ bash install.sh -y --no-chsh
 # 仅删除 easy-command 管理的 .zshrc 配置区块
 bash install.sh --uninstall
 
+# 删除配置区块、Oh My Zsh、托管插件和命令历史
+bash install.sh --purge
+
 # 启用可选的模糊搜索
 bash install.sh -y --with-fzf
 ```
@@ -104,13 +107,13 @@ bash install.sh -y --with-fzf
 ## 系统要求
 
 - macOS：需预先安装 Homebrew。
-- Ubuntu / Debian：脚本会使用 `apt-get` 安装依赖。
+- Linux：脚本会根据系统可用情况自动使用 `apt-get`、`dnf`、`pacman` 或 `zypper` 安装依赖。
 
 脚本需要 `sudo` 权限安装软件包和切换默认 Shell。没有 sudo 权限时，请使用 `--no-chsh`，并由管理员预先安装 Zsh。
 
 ## 配置与回退
 
-安装器只管理 `~/.zshrc` 中带有 `easy-command` 标记的配置区块。每次更新前会创建带时间戳的备份。执行 `--uninstall` 仅删除该托管区块，不会删除 Oh My Zsh、插件、命令历史或其他个人配置。
+安装器只管理 `~/.zshrc` 中带有 `easy-command` 标记的配置区块。每次更新前会创建带时间戳的备份。执行 `--uninstall` 仅删除该托管区块，不会删除 Oh My Zsh、插件、命令历史或其他个人配置。执行 `--purge` 会同时删除托管区块、Oh My Zsh、托管插件和命令历史。
 
 安装内容：
 
