@@ -148,3 +148,11 @@ curl -fsSL https://raw.githubusercontent.com/UnionSchool/easy-command/v2.1.0/ins
 ## License
 
 [MIT](LICENSE)
+
+## GitHub 自动发布与 Deployments
+
+推送 `v<版本>` 标签触发 `.github/workflows/publish.yml`，标签必须与 npm 包版本一致。工作流验证后通过 npm Trusted Publishing（OIDC）发布；正式版本使用 `latest`，预发布使用 `next`。
+
+发布任务使用 `npm` Environment，环境链接指向 npm 包页面，运行后在 GitHub Deployments 中显示结果。npm Trusted Publisher 继续使用 `UnionSchool`、本仓库名称和 `publish.yml`；如果设置了 Environment name，需与 `npm` 一致。无需改用长期 npm Token。
+
+普通代码推送不发布 npm。发布完成后核实 Deployment、公开 registry 的版本与安装结果；npm 页面或版本可能有处理延迟，不能只凭 Actions 成功判断包已可下载。
