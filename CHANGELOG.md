@@ -2,6 +2,12 @@
 
 All notable changes to easy-command are documented here.
 
+## 2.1.1 - 2026-10-17
+
+- Standardized automatic npm publishing from GitHub version tags, with version validation and package checks.
+- Added the npm deployment environment so releases appear in GitHub Deployments.
+- Stable releases use latest; prereleases use next.
+
 ## 2.1.0 - 2026-10-01
 
 - Linux package installation now falls back through `apt-get`, `dnf`, `pacman`, and `zypper` instead of requiring `apt-get`.
